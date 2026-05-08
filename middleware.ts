@@ -1,3 +1,5 @@
+// middleware.ts
+
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
@@ -19,7 +21,14 @@ export async function middleware(request: NextRequest) {
           cookiesToSet: {
             name: string
             value: string
-            options?: Parameters<typeof request.cookies.set>[2]
+            options?: {
+              path?: string
+              domain?: string
+              maxAge?: number
+              secure?: boolean
+              httpOnly?: boolean
+              sameSite?: 'lax' | 'strict' | 'none'
+            }
           }[]
         ) {
           cookiesToSet.forEach(({ name, value, options }) => {
@@ -32,7 +41,21 @@ export async function middleware(request: NextRequest) {
     }
   )
 
+  // Refresh auth session
   await supabase.auth.getUser()
 
   return response
+}
+
+export const config = {
+  matcher: [
+    /*
+     * Match all request paths except:
+     * - _next/static
+     * - _next/image
+     * - favicon.ico
+     * - images
+     */
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+  ],
 }
