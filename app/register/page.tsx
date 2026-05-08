@@ -20,14 +20,12 @@ export default function RegisterPage() {
       setLoading(true)
       setError('')
 
-      // Create auth user
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
       })
 
       if (error) {
-        console.error(error)
         setError(error.message)
         return
       }
@@ -39,7 +37,6 @@ export default function RegisterPage() {
         return
       }
 
-      // Create profile
       const { error: profileError } = await supabase
         .from('profiles')
         .insert({
@@ -49,7 +46,6 @@ export default function RegisterPage() {
         })
 
       if (profileError) {
-        console.error(profileError)
         setError(profileError.message)
         return
       }
