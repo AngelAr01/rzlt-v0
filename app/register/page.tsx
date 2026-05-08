@@ -121,32 +121,75 @@ export default function OnboardingPage() {
       default: return false
     }
   }
-
   async function handleSubmit() {
+  try {
     setLoading(true)
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return
+
+    console.log('Starting onboarding submit...')
+
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser()
+
+    console.log('USER:', user)
+    console.log('USER ERROR:', userError)
+
+    if (userError || !user) {
+      console.error('No authenticated user found')
+      return
+    }
 
     const today = new Date().toISOString().split('T')[0]
 
-    // Guardar baseline
-    await supabase.from('baseline_responses').insert({
-      user_id: user.id,
-      ...data,
-    })
+    // Save baseline responses
+    const { data: baselineData, error: baselineError } = await supabase
+      .from('baseline_responses')
+      .insert({
+        user_id: user.id,
+        ...data,
+      })
+      .select()
 
-    // Activar experimento
-    await supabase
-      .from('users')
+    console.log('BASELINE DATA:', baselineData)
+    console.log('BASELINE ERROR:', baselineError)
+
+    if (baselineError) {
+      console.error('Failed saving baseline')
+      return
+    }
+
+    // Update profile
+    const { data: profileData, error: profileError } = await supabase
+      .from('profiles')
       .update({
         onboarding_complete: true,
         experiment_active: true,
         experiment_start_date: today,
       })
       .eq('id', user.id)
+      .select()
+
+    console.log('PROFILE DATA:', profileData)
+    console.log('PROFILE ERROR:', profileError)
+
+    if (profileError) {
+      console.error('Failed updating profile')
+      return
+    }
+
+    console.log('Onboarding completed successfully')
 
     router.push('/dashboard')
+
+  } catch (error) {
+    console.error('HANDLE SUBMIT ERROR:', error)
+
+  } finally {
+    setLoading(false)
   }
+}
+
 
   const steps: Record<number, React.ReactNode> = {
     1: (
