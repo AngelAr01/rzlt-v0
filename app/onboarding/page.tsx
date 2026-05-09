@@ -150,11 +150,12 @@ export default function OnboardingPage() {
 
       const user = session.user
 
-      // CREATE PROFILE IF IT DOESN'T EXIST
+      // CREATE / UPDATE PROFILE
       const { error: profileError } = await supabase
         .from('profiles')
         .upsert({
           id: user.id,
+          email: user.email,
           username: user.email?.split('@')[0] || 'user',
           onboarding_complete: true,
           experiment_start_date: new Date().toISOString(),
