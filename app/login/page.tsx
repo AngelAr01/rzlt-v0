@@ -30,9 +30,8 @@ export default function LoginPage() {
       }
 
       window.location.href = '/dashboard';
-
     } catch (err: any) {
-      setError('Error inesperado. Intenta de nuevo.');
+      setError('Error inesperado');
     } finally {
       setLoading(false);
     }
@@ -48,29 +47,31 @@ export default function LoginPage() {
         </div>
 
         <form onSubmit={handleLogin} className="space-y-6">
-          <div>
-            <input
-              type="email"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full bg-zinc-950 border border-zinc-800 p-4 rounded-xl focus:border-white outline-none"
-              required
-            />
-          </div>
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full bg-zinc-950 border border-zinc-800 p-4 rounded-xl"
+            required
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full bg-zinc-950 border border-zinc-800 p-4 rounded-xl"
+            required
+          />
 
-          <div>
-            <input
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full bg-zinc-950 border border-zinc-800 p-4 rounded-xl focus:border-white outline-none"
-              required
-            />
-          </div>
+          {error && <p className="text-red-400 text-center">{error}</p>}
 
-          {error && (
-            <div className="text-red-400 text-sm text-center bg-red-950/30 p-3 rounded-xl">
-              {error}
-            </div>
+          <Button type="submit" disabled={loading} className="w-full py-6">
+            {loading ? 'Cargando...' : 'Sign In'}
+          </Button>
+        </form>
+
+        <p className="text-center mt-6 text-zinc-500">
+          No tienes cuenta?{' '}
+          <Link href="/register" className="text-white underline">
+            Register
