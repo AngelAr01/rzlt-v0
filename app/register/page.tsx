@@ -15,9 +15,7 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  async function handleRegister() {
-    alert(process.env.NEXT_PUBLIC_SUPABASE_URL)
-alert(!!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
+  async function 
     try {
       setLoading(true)
       setError('')
