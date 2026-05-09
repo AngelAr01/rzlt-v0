@@ -8,7 +8,7 @@ import { Progress } from '@/components/ui/progress'
 
 type BaselineData = {
   primary_activity: string
-  sessions_per_week: string
+ sessions_per_week: string
   avg_session_duration: string
   usual_play_time: string
   wearable_device: string
@@ -74,7 +74,6 @@ function ScaleSelector({
 
 export default function OnboardingPage() {
   const router = useRouter()
-  const supabase = createClient()
 
   const [step, setStep] = useState(1)
   const [loading, setLoading] = useState(false)
@@ -138,18 +137,23 @@ export default function OnboardingPage() {
     try {
       setLoading(true)
 
+      const supabase = createClient()
+
       const {
-        data: { user },
-        error: userError,
-      } = await supabase.auth.getUser()
+        data: { session },
+        error: sessionError,
+      } = await supabase.auth.getSession()
 
-      console.log(user)
-      console.log(userError)
+      console.log('SESSION:', session)
+      console.log('SESSION ERROR:', sessionError)
 
-      if (!user || userError) {
-        alert('User not authenticated')
+      if (!session?.user) {
+        alert('No authenticated session found')
+        setLoading(false)
         return
       }
+
+      const user = session.user
 
       const { error: baselineError } = await supabase
         .from('baseline_responses')
@@ -158,10 +162,11 @@ export default function OnboardingPage() {
           ...data,
         })
 
-      console.log(baselineError)
+      console.log('BASELINE ERROR:', baselineError)
 
       if (baselineError) {
         alert(JSON.stringify(baselineError))
+        setLoading(false)
         return
       }
 
