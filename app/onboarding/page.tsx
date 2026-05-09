@@ -144,31 +144,28 @@ export default function OnboardingPage() {
       } = await supabase.auth.getSession()
 
       if (!session?.user) {
-        alert('No authenticated session found')
-        setLoading(false)
+        alert('No authenticated session')
         return
       }
 
       const user = session.user
 
-      // CREATE PROFILE FIRST
+      // CREATE PROFILE IF IT DOESN'T EXIST
       const { error: profileError } = await supabase
         .from('profiles')
         .upsert({
           id: user.id,
-          email: user.email,
+          username: user.email?.split('@')[0] || 'user',
           onboarding_complete: true,
+          experiment_start_date: new Date().toISOString(),
         })
-
-      console.log('PROFILE ERROR:', profileError)
 
       if (profileError) {
         alert(JSON.stringify(profileError))
-        setLoading(false)
         return
       }
 
-      // INSERT BASELINE
+      // SAVE BASELINE
       const { error: baselineError } = await supabase
         .from('baseline_responses')
         .insert({
@@ -176,11 +173,8 @@ export default function OnboardingPage() {
           ...data,
         })
 
-      console.log('BASELINE ERROR:', baselineError)
-
       if (baselineError) {
         alert(JSON.stringify(baselineError))
-        setLoading(false)
         return
       }
 
@@ -189,7 +183,6 @@ export default function OnboardingPage() {
     } catch (err) {
       console.error(err)
       alert('Unexpected error')
-
     } finally {
       setLoading(false)
     }
