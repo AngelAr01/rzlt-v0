@@ -8,8 +8,8 @@ import { Button } from '@/components/ui/button';
 
 export default function RegisterPage() {
   const router = useRouter();
-
   const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -19,32 +19,50 @@ export default function RegisterPage() {
     setLoading(true);
     setError('');
 
-    try {
-      const supabase = createClient();
+    const supabase = createClient();
 
-      const { data, error: supabaseError } = await supabase.auth.signUp({
-        email,
-        password,
+    const { data, error: signUpError } = await supabase.auth.signUp({
+      email,
+      password,
+    });
+
+    if (signUpError) {
+      setError(signUpError.message);
+      setLoading(false);
+      return;
+    }
+
+    if (!data.user) {
+      setError('Something went wrong. Try again.');
+      setLoading(false);
+      return;
+    }
+
+    const { error: profileError } = await supabase
+      .from('profiles')
+      .insert({
+        id: data.user.id,
+        email: email,
+        username: username.toLowerCase().trim(),
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       });
 
-      if (supabaseError) {
-        setError(supabaseError.message);
-        return;
-      }
-
-      alert('Revisa tu correo para confirmar la cuenta');
-      router.push('/login');
-
-    } catch (err: any) {
-      setError('Error al registrar');
-    } finally {
+    if (profileError) {
+      setError(
+        profileError.code === '23505'
+          ? 'Username already taken.'
+          : profileError.message
+      );
       setLoading(false);
+      return;
     }
+
+    router.push('/onboarding');
   }
 
   return (
     <main className="min-h-screen bg-black text-white flex items-center justify-center px-6 py-12">
-      <div className="w-full max-w-md border border-zinc-900 p-8 rounded-2xl">
+      <div className="w-full max-w-md border border-zinc-900 p-8">
         <div className="text-center mb-10">
           <p className="font-mono text-xs tracking-widest text-zinc-500 mb-3">RZLT</p>
           <h1 className="text-4xl font-bold mb-3">Create account</h1>
@@ -57,21 +75,31 @@ export default function RegisterPage() {
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full bg-zinc-950 border border-zinc-800 p-4 rounded-xl focus:border-white outline-none"
+            className="w-full bg-zinc-950 border border-zinc-800 p-4 text-white placeholder:text-zinc-700 focus:border-white outline-none"
+            required
+          />
+
+          <input
+            type="text"
+            placeholder="Username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            className="w-full bg-zinc-950 border border-zinc-800 p-4 text-white placeholder:text-zinc-700 focus:border-white outline-none"
             required
           />
 
           <input
             type="password"
-            placeholder="Password"
+            placeholder="Password (min. 8 characters)"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full bg-zinc-950 border border-zinc-800 p-4 rounded-xl focus:border-white outline-none"
+            className="w-full bg-zinc-950 border border-zinc-800 p-4 text-white placeholder:text-zinc-700 focus:border-white outline-none"
+            minLength={8}
             required
           />
 
           {error && (
-            <div className="text-red-400 text-sm text-center bg-red-950/30 p-3 rounded-xl">
+            <div className="text-red-400 text-sm text-center bg-red-950/30 p-3">
               {error}
             </div>
           )}
