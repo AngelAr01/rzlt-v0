@@ -79,7 +79,6 @@ function ScaleSelector({
 
 export default function OnboardingPage() {
   const router = useRouter()
-  const supabase = createClient()
   const [step, setStep] = useState(1)
   const [loading, setLoading] = useState(false)
   const [data, setData] = useState<BaselineData>({
