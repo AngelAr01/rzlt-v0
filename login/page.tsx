@@ -14,63 +14,52 @@ export default function LoginPage() {
     setLoading(true);
     setError('');
 
-    // Versión de prueba sin Supabase
+    // Prueba temporal
     setTimeout(() => {
-      setError('✅ Botón funciona! (versión de prueba)');
       setLoading(false);
       window.location.href = '/dashboard';
     }, 800);
   }
 
   return (
-    <main className="min-h-screen bg-black text-white flex items-center justify-center px-6 py-12">
-      <div className="w-full max-w-md border border-zinc-800 p-10 rounded-3xl">
-        <div className="text-center mb-10">
-          <h1 className="text-5xl font-bold mb-2">RZLT</h1>
-          <p className="text-2xl">Welcome back.</p>
-          <p className="text-zinc-500">Continue your experiment.</p>
+    <main className="min-h-screen bg-zinc-950 flex items-center justify-center px-4">
+      <div className="w-full max-w-md">
+        {/* Header elegante */}
+        <div className="text-center mb-12">
+          <div className="inline-block mb-4">
+            <span className="font-mono text-xs tracking-[4px] text-zinc-500">EXPERIMENT</span>
+          </div>
+          <h1 className="text-6xl font-bold tracking-tighter text-white">RZLT</h1>
+          <p className="text-2xl mt-4 text-white">Welcome back.</p>
+          <p className="text-zinc-400 mt-1">Continue your experiment.</p>
         </div>
 
-        <form onSubmit={handleLogin} className="space-y-6">
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full p-4 bg-zinc-900 border border-zinc-700 rounded-2xl text-white"
-            required
-          />
-
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full p-4 bg-zinc-900 border border-zinc-700 rounded-2xl text-white"
-            required
-          />
-
-          {error && (
-            <div className="text-center text-green-400 font-medium">
-              {error}
+        {/* Formulario */}
+        <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-8 shadow-2xl">
+          <form onSubmit={handleLogin} className="space-y-6">
+            <div>
+              <input
+                type="email"
+                placeholder="Email address"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full bg-black border border-zinc-700 focus:border-zinc-500 rounded-2xl px-5 py-4 text-white placeholder-zinc-500 outline-none"
+                required
+              />
             </div>
-          )}
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-white hover:bg-zinc-200 transition text-black py-6 rounded-2xl font-semibold text-lg disabled:opacity-70"
-          >
-            {loading ? 'Cargando...' : 'Sign In'}
-          </button>
-        </form>
+            <div>
+              <input
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full bg-black border border-zinc-700 focus:border-zinc-500 rounded-2xl px-5 py-4 text-white placeholder-zinc-500 outline-none"
+                required
+              />
+            </div>
 
-        <p className="text-center mt-8 text-zinc-500">
-          No tienes cuenta?{' '}
-          <Link href="/register" className="text-white underline">
-            Regístrate
-          </Link>
-        </p>
-      </div>
-    </main>
-  );
+            {error && <p className="text-red-400 text-center text-sm">{error}</p>}
+
+            <button
+              type
