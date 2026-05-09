@@ -12,14 +12,12 @@ export default function LoginPage() {
   const [error, setError] = useState('');
 
   async function handleLogin(e: React.FormEvent) {
-    e.preventDefault();
+    e.preventDefault();           // ← Esto es clave
     setLoading(true);
     setError('');
 
     try {
       const supabase = createClient();
-      
-      console.log("🔄 Intentando login con:", email);
 
       const { data, error: supabaseError } = await supabase.auth.signInWithPassword({
         email,
@@ -27,70 +25,51 @@ export default function LoginPage() {
       });
 
       if (supabaseError) {
-        console.error("❌ Error Supabase:", supabaseError);
         setError(supabaseError.message);
         return;
       }
 
-      console.log("✅ Login exitoso!", data.user?.email);
-      
-      // Redirección fuerte
+      // Login exitoso
       window.location.href = '/dashboard';
 
     } catch (err: any) {
-      console.error("❌ Error catch:", err);
-      setError('Error inesperado. Revisa la consola.');
+      setError('Error inesperado. Intenta de nuevo.');
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <main className="min-h-screen bg-black text-white flex items-center justify-center px-6">
-      <div className="w-full max-w-md border border-zinc-900 p-8 rounded-xl">
-        <div className="mb-8 text-center">
+    <main className="min-h-screen bg-black text-white flex items-center justify-center px-6 py-12">
+      <div className="w-full max-w-md border border-zinc-900 p-8 rounded-2xl">
+        <div className="text-center mb-10">
           <p className="font-mono text-xs tracking-widest text-zinc-500 mb-3">RZLT</p>
-          <h1 className="text-3xl font-bold mb-2">Welcome back.</h1>
-          <p className="text-zinc-500">Continue your experiment.</p>
+          <h1 className="text-4xl font-bold mb-3">Welcome back.</h1>
+          <p className="text-zinc-400">Continue your experiment.</p>
         </div>
 
-        <form onSubmit={handleLogin} className="flex flex-col gap-4">
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="bg-black border border-zinc-800 px-4 py-3 text-sm outline-none focus:border-white rounded"
-            required
-          />
+        <form onSubmit={handleLogin} className="space-y-6">
+          <div>
+            <input
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full bg-zinc-950 border border-zinc-800 p-4 rounded-xl focus:border-white outline-none"
+              required
+            />
+          </div>
 
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="bg-black border border-zinc-800 px-4 py-3 text-sm outline-none focus:border-white rounded"
-            required
-          />
+          <div>
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full bg-zinc-950 border border-zinc-800 p-4 rounded-xl focus:border-white outline-none"
+              required
+            />
+          </div>
 
-          {error && <div className="text-red-400 text-sm">{error}</div>}
-
-          <Button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-white text-black hover:bg-zinc-200 py-6 font-medium"
-          >
-            {loading ? 'Entering the lab...' : 'Sign In'}
-          </Button>
-        </form>
-
-        <div className="mt-6 text-center text-sm">
-          Don&apos;t have an account?{' '}
-          <Link href="/register" className="text-white hover:underline">
-            Register
-          </Link>
-        </div>
-      </div>
-    </main>
-  );
-}
+          {error && (
+            <div className="text-red-400 text-sm text-center bg-red-950/30 p-3 rounded
