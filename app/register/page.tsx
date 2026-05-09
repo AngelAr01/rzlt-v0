@@ -19,7 +19,8 @@ export default function RegisterPage() {
     try {
       setLoading(true)
       setError('')
-
+console.log('SUPABASE URL:', process.env.NEXT_PUBLIC_SUPABASE_URL)
+console.log('SUPABASE KEY EXISTS:', !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
