@@ -26,10 +26,11 @@ export default function RegisterPage() {
       })
 
       if (error) {
-        setError(error.message)
-        return
-      }
-
+  console.log('FULL ERROR:', error)
+  setError(JSON.stringify(error))
+  return
+}
+    
       const user = data.user
 
       if (!user) {
