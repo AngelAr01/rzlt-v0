@@ -14,20 +14,36 @@ export default function LoginPage() {
   const [error, setError] = useState('');
 
   async function handleLogin(e: React.FormEvent) {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
+  e.preventDefault();
+  setLoading(true);
+  setError('');
 
-    try {
-      const supabase = createClient();
-      
-      console.log("Intentando login con:", email); // ← debug
+  try {
+    const supabase = createClient();
 
-      const { data, error: supabaseError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+    const { data, error: supabaseError } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
 
+    if (supabaseError) {
+      console.error(supabaseError);
+      setError(supabaseError.message);
+      return;
+    }
+
+    console.log("✅ Login exitoso", data.user?.email);
+
+    // Forzar navegación + refresh
+    window.location.href = '/dashboard';  // ← Esto es más confiable ahora
+
+  } catch (err: any) {
+    console.error(err);
+    setError('Error inesperado. Intenta de nuevo.');
+  } finally {
+    setLoading(false);
+  }
+}
       if (supabaseError) {
         console.error("Error de Supabase:", supabaseError);
         setError(supabaseError.message);
