@@ -1,113 +1,83 @@
-// app/login/page.tsx
 'use client'
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
 import { supabase } from '@/lib/supabase/client'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 
 export default function LoginPage() {
   const router = useRouter()
 
-
-  const [form, setForm] = useState({ email: '', password: '' })
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [error, setError] = useState('')
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    setLoading(true)
-    setError(null)
+  async function handleLogin() {
+    try {
+      setLoading(true)
+      setError('')
 
-    const { error } = await supabase.auth.signInWithPassword({
-      email: form.email,
-      password: form.password,
-    })
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      })
 
-    if (error) {
-      setError('Invalid email or password.')
-      setLoading(false)
-      return
-    }
+      if (error) {
+        setError(error.message)
+        return
+      }
 
-    // Verificar si completó onboarding
-    const { data: { user } } = await supabase.auth.getUser()
-    const { data: profile } = await supabase
-      .from('users')
-      .select('onboarding_complete')
-      .eq('id', user!.id)
-      .single()
-
-    if (!profile?.onboarding_complete) {
-      router.push('/onboarding')
-    } else {
       router.push('/dashboard')
+
+    } catch (err) {
+      console.error(err)
+      setError('Something went wrong')
+
+    } finally {
+      setLoading(false)
     }
   }
 
   return (
-    <main className="min-h-screen bg-black text-white flex flex-col justify-center items-center px-6">
-      <div className="w-full max-w-sm">
-        <div className="mb-8">
-          <Link href="/" className="font-mono text-xs text-zinc-600 hover:text-zinc-400">
-            ← RZLT
-          </Link>
-        </div>
+    <main className="min-h-screen bg-black text-white flex items-center justify-center px-6">
+      <div className="w-full max-w-sm border border-zinc-800 p-8">
+        <h1 className="text-2xl font-bold mb-6">
+          Login
+        </h1>
 
-        <h1 className="text-2xl font-bold mb-1">Welcome back</h1>
-        <p className="text-zinc-500 text-sm mb-8">Continue your experiment.</p>
+        <div className="flex flex-col gap-4">
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-          <div>
-            <Label className="text-zinc-400 text-xs font-mono tracking-wider mb-2 block">
-              EMAIL
-            </Label>
-            <Input
-              type="email"
-              required
-              value={form.email}
-              onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
-              className="bg-zinc-950 border-zinc-800 text-white"
-            />
-          </div>
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="bg-black border border-zinc-800 px-4 py-3"
+          />
 
-          <div>
-            <Label className="text-zinc-400 text-xs font-mono tracking-wider mb-2 block">
-              PASSWORD
-            </Label>
-            <Input
-              type="password"
-              required
-              value={form.password}
-              onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
-              className="bg-zinc-950 border-zinc-800 text-white"
-            />
-          </div>
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="bg-black border border-zinc-800 px-4 py-3"
+          />
 
           {error && (
-            <p className="text-red-400 text-sm font-mono border border-red-900 bg-red-950/30 px-3 py-2">
+            <p className="text-red-500 text-sm">
               {error}
             </p>
           )}
 
-          <Button
-            type="submit"
+          <button
+            onClick={handleLogin}
             disabled={loading}
-            className="bg-white text-black hover:bg-zinc-200 font-mono tracking-wider mt-2"
+            className="bg-white text-black py-3 font-bold"
           >
-            {loading ? 'Logging in...' : 'Login →'}
-          </Button>
-        </form>
+            {loading ? 'Loading...' : 'Login'}
+          </button>
 
-        <p className="text-center text-zinc-600 text-sm mt-6">
-          No account?{' '}
-          <Link href="/register" className="text-zinc-400 hover:text-white">
-            Join the experiment
-          </Link>
-        </p>
+        </div>
       </div>
     </main>
   )
