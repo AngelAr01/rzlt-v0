@@ -7,64 +7,27 @@ import { supabase } from '@/lib/supabase/client'
 export default function RegisterPage() {
   const router = useRouter()
 
-
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [username, setUsername] = useState('')
-
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
   async function handleRegister() {
-  try {
-    setLoading(true)
-    setError('')
+    try {
+      setLoading(true)
+      setError('')
 
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-    })
-
-    if (error) {
-      setError(error.message)
-      return
-    }
-
-    console.log('REGISTER SUCCESS:', data)
-
-  } catch (err) {
-    console.error(err)
-    setError('Something went wrong')
-  } finally {
-    setLoading(false)
-  }
-}
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+      })
 
       if (error) {
-  console.log('FULL ERROR:', error)
-  setError(JSON.stringify(error))
-  return
-}
-    
-      const user = data.user
-
-      if (!user) {
-        setError('User not created')
+        setError(error.message)
         return
       }
 
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .insert({
-          id: user.id,
-          email,
-          username,
-        })
-
-      if (profileError) {
-        setError(profileError.message)
-        return
-      }
+      console.log('REGISTER SUCCESS:', data)
 
       router.push('/onboarding')
 
@@ -79,50 +42,44 @@ export default function RegisterPage() {
 
   return (
     <main className="min-h-screen bg-black text-white flex items-center justify-center px-6">
-      <div className="w-full max-w-sm flex flex-col gap-4">
-
-        <h1 className="text-3xl font-bold">
+      <div className="w-full max-w-sm border border-zinc-800 p-8">
+        <h1 className="text-2xl font-bold mb-6">
           Create Account
         </h1>
 
-        <input
-          type="text"
-          placeholder="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          className="bg-zinc-900 border border-zinc-800 px-4 py-3"
-        />
+        <div className="flex flex-col gap-4">
 
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="bg-zinc-900 border border-zinc-800 px-4 py-3"
-        />
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="bg-black border border-zinc-800 px-4 py-3"
+          />
 
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="bg-zinc-900 border border-zinc-800 px-4 py-3"
-        />
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="bg-black border border-zinc-800 px-4 py-3"
+          />
 
-        {error && (
-          <p className="text-red-500 text-sm">
-            {error}
-          </p>
-        )}
+          {error && (
+            <p className="text-red-500 text-sm">
+              {error}
+            </p>
+          )}
 
-        <button
-          onClick={handleRegister}
-          disabled={loading}
-          className="bg-white text-black py-3 font-bold"
-        >
-          {loading ? 'Creating Account...' : 'Create Account'}
-        </button>
+          <button
+            onClick={handleRegister}
+            disabled={loading}
+            className="bg-white text-black py-3 font-bold"
+          >
+            {loading ? 'Loading...' : 'Create Account'}
+          </button>
 
+        </div>
       </div>
     </main>
   )
