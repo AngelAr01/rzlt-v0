@@ -1,64 +1,45 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
 
 export default function LoginPage() {
-  const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
   async function handleLogin(e: React.FormEvent) {
-  e.preventDefault();
-  setLoading(true);
-  setError('');
+    e.preventDefault();
+    setLoading(true);
+    setError('');
 
-  try {
-    const supabase = createClient();
+    try {
+      const supabase = createClient();
+      
+      console.log("🔄 Intentando login con:", email);
 
-    const { data, error: supabaseError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+      const { data, error: supabaseError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-    if (supabaseError) {
-      console.error(supabaseError);
-      setError(supabaseError.message);
-      return;
-    }
-
-    console.log("✅ Login exitoso", data.user?.email);
-
-    // Forzar navegación + refresh
-    window.location.href = '/dashboard';  // ← Esto es más confiable ahora
-
-  } catch (err: any) {
-    console.error(err);
-    setError('Error inesperado. Intenta de nuevo.');
-  } finally {
-    setLoading(false);
-  }
-}
       if (supabaseError) {
-        console.error("Error de Supabase:", supabaseError);
+        console.error("❌ Error Supabase:", supabaseError);
         setError(supabaseError.message);
         return;
       }
 
-      console.log("Login exitoso!", data.user?.email);
+      console.log("✅ Login exitoso!", data.user?.email);
       
-      // Forzar refresh del estado
-      await router.refresh();
-      router.push('/dashboard');
+      // Redirección fuerte
+      window.location.href = '/dashboard';
 
     } catch (err: any) {
-      console.error("Error catch:", err);
-      setError(err.message || 'Error inesperado');
+      console.error("❌ Error catch:", err);
+      setError('Error inesperado. Revisa la consola.');
     } finally {
       setLoading(false);
     }
@@ -79,7 +60,7 @@ export default function LoginPage() {
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="bg-black border border-zinc-800 px-4 py-3 text-sm outline-none focus:border-white"
+            className="bg-black border border-zinc-800 px-4 py-3 text-sm outline-none focus:border-white rounded"
             required
           />
 
@@ -88,22 +69,18 @@ export default function LoginPage() {
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="bg-black border border-zinc-800 px-4 py-3 text-sm outline-none focus:border-white"
+            className="bg-black border border-zinc-800 px-4 py-3 text-sm outline-none focus:border-white rounded"
             required
           />
 
-          {error && (
-            <div className="border border-red-900 bg-red-950/30 p-3 rounded text-red-400 text-sm">
-              {error}
-            </div>
-          )}
+          {error && <div className="text-red-400 text-sm">{error}</div>}
 
           <Button
             type="submit"
             disabled={loading}
             className="w-full bg-white text-black hover:bg-zinc-200 py-6 font-medium"
           >
-            {loading ? 'Entering...' : 'Sign In'}
+            {loading ? 'Entering the lab...' : 'Sign In'}
           </Button>
         </form>
 
