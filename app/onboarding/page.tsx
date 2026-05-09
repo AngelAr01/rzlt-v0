@@ -8,7 +8,7 @@ import { Progress } from '@/components/ui/progress'
 
 type BaselineData = {
   primary_activity: string
- sessions_per_week: string
+  sessions_per_week: string
   avg_session_duration: string
   usual_play_time: string
   wearable_device: string
@@ -141,11 +141,7 @@ export default function OnboardingPage() {
 
       const {
         data: { session },
-        error: sessionError,
       } = await supabase.auth.getSession()
-
-      console.log('SESSION:', session)
-      console.log('SESSION ERROR:', sessionError)
 
       if (!session?.user) {
         alert('No authenticated session found')
@@ -155,6 +151,24 @@ export default function OnboardingPage() {
 
       const user = session.user
 
+      // CREATE PROFILE FIRST
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .upsert({
+          id: user.id,
+          email: user.email,
+          onboarding_complete: true,
+        })
+
+      console.log('PROFILE ERROR:', profileError)
+
+      if (profileError) {
+        alert(JSON.stringify(profileError))
+        setLoading(false)
+        return
+      }
+
+      // INSERT BASELINE
       const { error: baselineError } = await supabase
         .from('baseline_responses')
         .insert({
