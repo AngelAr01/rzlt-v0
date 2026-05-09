@@ -1,60 +1,64 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { supabase } from '@/lib/supabase/client'
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { createClient } from '@/lib/supabase/client';
+import { Button } from '@/components/ui/button';
 
 export default function RegisterPage() {
-  const router = useRouter()
+  const router = useRouter();
 
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  async function handleRegister() {
+  async function handleRegister(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+
     try {
-      setLoading(true)
-      setError('')
+      const supabase = createClient();
 
-      const { data, error } = await supabase.auth.signUp({
+      const { data, error: supabaseError } = await supabase.auth.signUp({
         email,
         password,
-      })
+      });
 
-      if (error) {
-        setError(error.message)
-        return
+      if (supabaseError) {
+        setError(supabaseError.message);
+        return;
       }
 
-      console.log('REGISTER SUCCESS:', data)
+      alert('Revisa tu correo para confirmar la cuenta');
+      router.push('/login');
 
-      router.push('/onboarding')
-
-    } catch (err) {
-      console.error(err)
-      setError('Something went wrong')
-
+    } catch (err: any) {
+      setError('Error al registrar');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
   return (
-    <main className="min-h-screen bg-black text-white flex items-center justify-center px-6">
-      <div className="w-full max-w-sm border border-zinc-800 p-8">
-        <h1 className="text-2xl font-bold mb-6">
-          Create Account
-        </h1>
+    <main className="min-h-screen bg-black text-white flex items-center justify-center px-6 py-12">
+      <div className="w-full max-w-md border border-zinc-900 p-8 rounded-2xl">
+        <div className="text-center mb-10">
+          <p className="font-mono text-xs tracking-widest text-zinc-500 mb-3">RZLT</p>
+          <h1 className="text-4xl font-bold mb-3">Create account</h1>
+          <p className="text-zinc-400">Join the experiment.</p>
+        </div>
 
-        <div className="flex flex-col gap-4">
-
+        <form onSubmit={handleRegister} className="space-y-6">
           <input
             type="email"
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="bg-black border border-zinc-800 px-4 py-3"
+            className="w-full bg-zinc-950 border border-zinc-800 p-4 rounded-xl focus:border-white outline-none"
+            required
           />
 
           <input
@@ -62,25 +66,32 @@ export default function RegisterPage() {
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="bg-black border border-zinc-800 px-4 py-3"
+            className="w-full bg-zinc-950 border border-zinc-800 p-4 rounded-xl focus:border-white outline-none"
+            required
           />
 
           {error && (
-            <p className="text-red-500 text-sm">
+            <div className="text-red-400 text-sm text-center bg-red-950/30 p-3 rounded-xl">
               {error}
-            </p>
+            </div>
           )}
 
-          <button
-            onClick={handleRegister}
+          <Button
+            type="submit"
             disabled={loading}
-            className="bg-white text-black py-3 font-bold"
+            className="w-full py-6 text-base font-medium bg-white text-black hover:bg-zinc-200"
           >
-            {loading ? 'Loading...' : 'Create Account'}
-          </button>
+            {loading ? 'Creating account...' : 'Create Account'}
+          </Button>
+        </form>
 
-        </div>
+        <p className="text-center text-sm text-zinc-500 mt-8">
+          Already have an account?{' '}
+          <Link href="/login" className="text-white hover:underline">
+            Sign in
+          </Link>
+        </p>
       </div>
     </main>
-  )
+  );
 }
