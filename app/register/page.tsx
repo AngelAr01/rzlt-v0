@@ -15,16 +15,30 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  async function 
-    try {
-      setLoading(true)
-      setError('')
-console.log('SUPABASE URL:', process.env.NEXT_PUBLIC_SUPABASE_URL)
-console.log('SUPABASE KEY EXISTS:', !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-      })
+  async function handleRegister() {
+  try {
+    setLoading(true)
+    setError('')
+
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+    })
+
+    if (error) {
+      setError(error.message)
+      return
+    }
+
+    console.log('REGISTER SUCCESS:', data)
+
+  } catch (err) {
+    console.error(err)
+    setError('Something went wrong')
+  } finally {
+    setLoading(false)
+  }
+}
 
       if (error) {
   console.log('FULL ERROR:', error)
