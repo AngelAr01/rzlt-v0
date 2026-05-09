@@ -12,7 +12,7 @@ export default function LoginPage() {
   const [error, setError] = useState('');
 
   async function handleLogin(e: React.FormEvent) {
-    e.preventDefault();           // ← Esto es clave
+    e.preventDefault();
     setLoading(true);
     setError('');
 
@@ -29,7 +29,7 @@ export default function LoginPage() {
         return;
       }
 
-      // Login exitoso
+      // Redirección fuerte
       window.location.href = '/dashboard';
 
     } catch (err: any) {
@@ -72,4 +72,20 @@ export default function LoginPage() {
           </div>
 
           {error && (
-            <div className="text-red-400 text-sm text-center bg-red-950/30 p-3 rounded
+            <div className="text-red-400 text-sm text-center bg-red-950/30 p-3 rounded-xl">
+              {error}
+            </div>
+          )}
+
+          <Button
+            type="submit"
+            disabled={loading}
+            className="w-full py-6 text-base font-medium bg-white text-black hover:bg-zinc-200"
+          >
+            {loading ? 'Entering the lab...' : 'Sign In'}
+          </Button>
+        </form>
+
+        <p className="text-center text-sm text-zinc-500 mt-8">
+          Don't have an account?{' '}
+          <
