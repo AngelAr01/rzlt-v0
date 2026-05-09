@@ -19,7 +19,7 @@ export default function LoginPage() {
     try {
       const supabase = createClient();
 
-      const { data, error: supabaseError } = await supabase.auth.signInWithPassword({
+      const { error: supabaseError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
@@ -30,8 +30,8 @@ export default function LoginPage() {
       }
 
       window.location.href = '/dashboard';
-    } catch (err: any) {
-      setError('Error inesperado');
+    } catch (err) {
+      setError('Error al iniciar sesión');
     } finally {
       setLoading(false);
     }
@@ -52,7 +52,7 @@ export default function LoginPage() {
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full bg-zinc-950 border border-zinc-800 p-4 rounded-xl"
+            className="w-full bg-zinc-950 border border-zinc-800 p-4 rounded-xl focus:border-white outline-none"
             required
           />
           <input
@@ -60,18 +60,32 @@ export default function LoginPage() {
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full bg-zinc-950 border border-zinc-800 p-4 rounded-xl"
+            className="w-full bg-zinc-950 border border-zinc-800 p-4 rounded-xl focus:border-white outline-none"
             required
           />
 
-          {error && <p className="text-red-400 text-center">{error}</p>}
+          {error && (
+            <div className="text-red-400 text-sm text-center bg-red-950/30 p-3 rounded-xl">
+              {error}
+            </div>
+          )}
 
-          <Button type="submit" disabled={loading} className="w-full py-6">
-            {loading ? 'Cargando...' : 'Sign In'}
+          <Button
+            type="submit"
+            disabled={loading}
+            className="w-full py-6 text-base font-medium bg-white text-black hover:bg-zinc-200"
+          >
+            {loading ? 'Entering the lab...' : 'Sign In'}
           </Button>
         </form>
 
-        <p className="text-center mt-6 text-zinc-500">
-          No tienes cuenta?{' '}
-          <Link href="/register" className="text-white underline">
+        <p className="text-center text-sm text-zinc-500 mt-8">
+          Don't have an account?{' '}
+          <Link href="/register" className="text-white hover:underline">
             Register
+          </Link>
+        </p>
+      </div>
+    </main>
+  );
+}
